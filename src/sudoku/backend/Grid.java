@@ -133,12 +133,21 @@ class Grid {
                 ////// CHECK BOX
 
                 // find the box
-                // TODO modify this to use MAX_DIGIT (for porting to 9x9) (not sure if math still applies though)
-                int box = 2 * (pos / 8) + (pos % 4) / 2;
+                // old calc -- fixed values
+                // int box = 2 * (pos / 8) + (pos % 4) / 2;
+                // new calc -- variable values
+                int sqrt = (int) Math.sqrt(MAX_DIGIT);
+                int box = sqrt * (pos / (MAX_DIGIT*sqrt)) + (pos % MAX_DIGIT) / sqrt;
 
                 // iterate through box
                 for (int j = 0; j < MAX_DIGIT; j++) {
-                    int b = (box/2)*8 + (box%2)*2 + (j/2)*4 + j%2;
+
+                    //old calc -- fixed values
+                    //int b = (box/2)*8 + (box%2)*2 + (j/2)*4 + j%2;
+                    //new calc -- variable values
+                    int b = (box/sqrt)*(MAX_DIGIT*sqrt) + (box % sqrt)*sqrt + (j/sqrt)*MAX_DIGIT + j % sqrt;
+
+
                     if (b == pos) { // don't compare current cell to itself
                         continue;
                     }
@@ -209,6 +218,7 @@ math for box is tricky
 box base = 2*(position/8)+(position%4)/2
 once I know the base, I can calculate the 4 positions by:
 (base/2)*8+(base%2)*2 + (j/2)*4+j%2
+NOTE: parenthesis are important. order of operations matter
 */
 
 }
