@@ -29,10 +29,6 @@ class Cell {
         locked = true;
     }
 
-//    void unlock() {
-//        locked = false;
-//    }
-
     boolean isLocked() {
         return locked;
     }
