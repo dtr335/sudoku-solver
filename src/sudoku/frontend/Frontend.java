@@ -113,7 +113,13 @@ public class Frontend {
             System.out.print("| ");
             for (int j=0; j<4; j++) {
                 int pos = 4*i + j;
-                System.out.print(puzzle.getCellValue(pos));
+
+                if (puzzle.getCellValue(pos) == 0) {
+                    System.out.print("-");
+                } else {
+                    System.out.print(puzzle.getCellValue(pos));
+                }
+
                 if (j % 2 == 1) {
                     System.out.print(" | ");
                 } else {
