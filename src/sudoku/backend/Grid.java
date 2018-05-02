@@ -1,11 +1,13 @@
 package sudoku.backend;
 
+// todo edit comment
 /**
  * A representation of a 4x4 Sudoku grid. Provides methods for setting up the puzzle and solving it (via brute force).
  * This is a package-private class. Input is assumed to be correct -- error-checking is not provided.
  */
 class Grid {
 
+    // todo set these in constructor
     final int PUZZLE_SIZE = 16;
     final int MAX_DIGIT = 4;
 
@@ -16,17 +18,6 @@ class Grid {
         for (int i=0; i<PUZZLE_SIZE; i++) {
             grid[i] = new Cell();
         }
-    }
-
-    /**
-     * DEPRECATED
-     * Used for setting up the grid before solving. A preset cell must be locked, or it will be changed during the solving phase.
-     * @param position
-     * @param value
-     */
-    void setAndLockCell(int position, int value) {
-        grid[position].setValue(value);
-        grid[position].lock();
     }
 
     /**
@@ -204,6 +195,7 @@ class Grid {
 
 /*
 some math (for 4x4):
+9x9 math is similar, just use 9's and 3's instead of 4's and 2's (base and sqrt(base))
 
 row:
 row base = position / 4
