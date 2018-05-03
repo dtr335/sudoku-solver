@@ -5,40 +5,63 @@ import sudoku.backend.Puzzle;
 import java.util.Scanner;
 
 /**
- * Provides a frontend interface to run a console-based Sudoku solver
+ * An interactive console app for solving a Sudoku puzzle.
  */
 public class Frontend {
 
     public static void main(String[] args) {
 
-        Puzzle puzzle = new Puzzle();
-
-        System.out.println("===============================================");
+        System.out.println("===========================================");
         System.out.println("Welcome to Sudoku Solver.");
-        System.out.println("Using brute force to solve a 4x4 Sudoku puzzle.");
-        System.out.println("===============================================");
-        System.out.println();
-
-        System.out.println("To set up the puzzle:");
-        System.out.println("* Choose a cell to modify. Locations range from 0-15, according to the following key:");
-        displayLocations();
-        System.out.println("* Choose a value for the cell. Values range from 1-4. Alternatively, entering a 0 resets a cell, erasing its current value.");
-        System.out.println();
-        System.out.println("To solve the puzzle, press ENTER at any time.");
+        System.out.println("Using brute force to solve a Sudoku puzzle.");
+        System.out.println("===========================================");
         System.out.println();
 
         Scanner sc = new Scanner(System.in);
 
-        // start setting up puzzle
-        while (true) {
+        // get puzzle size
+        int maxDigit;
+        do {
+            System.out.print("Select a puzzle size (options: 4, 9): ");
+            String input = sc.nextLine();
+            try {
+                maxDigit = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a 4 or a 9.");
+                continue;
+            }
+            if (maxDigit == 4 || maxDigit == 9) { // valid input
+                break;
+            } else {
+                System.out.println("Please enter a 4 or a 9.");
+            }
+        } while (true);
 
+        Puzzle puzzle = new Puzzle(maxDigit);
+        int maxPosition = maxDigit*maxDigit - 1;
+
+        System.out.printf("Solving for a %dx%d puzzle.\n", maxDigit, maxDigit);
+        System.out.println();
+
+        System.out.println("To set up the puzzle:");
+        System.out.printf("* Choose a cell to modify. Locations range from 0-%d, according to the following key:\n", maxPosition);
+        displayLocations(puzzle);
+        System.out.printf("* Choose a value for the cell. Values range from 1-%d.\n", maxDigit);
+        System.out.println("* (Or, enter a 0 to erase a previously-set cell.)");
+        System.out.println();
+        System.out.println("To solve the puzzle, press ENTER at any time.");
+        System.out.println();
+
+
+        // start setting up puzzle
+        do {
             // get position from user
             int position = -1;
             boolean finishedSetup = false;
-            while (true) {
-                System.out.print("Enter a cell to modify (0-15): ");
+            do {
+                System.out.printf("Enter a cell to modify (0-%d): ", maxPosition);
                 String input = sc.nextLine();
-                if (input.equals("")) {
+                if (input.equals("")) { // user hit enter, solve now
                     finishedSetup = true;
                     break;
                 }
@@ -48,18 +71,18 @@ public class Frontend {
                     System.out.println("Please enter an integer.");
                     continue;
                 }
-                if (position < 0 || position > 15) {
-                    System.out.println("Please enter a location from 0 to 15.");
-                    continue;
+                if (position >= 0 && position <= maxPosition) { // valid input
+                    break;
+                } else {
+                    System.out.printf("Please enter a location from 0 to %d.\n", maxPosition);
                 }
-                break;
-            }
+            } while (true);
             // get value from user
             int value = -1;
             while (!finishedSetup) { // don't need to do this part if user wants to solve now
-                System.out.print("Enter a value (0-4): ");
+                System.out.printf("Enter a value (0-%d): ", maxDigit);
                 String input = sc.nextLine();
-                if (input.equals("")) {
+                if (input.equals("")) { // user hit enter, solve now
                     finishedSetup = true;
                     break;
                 }
@@ -69,28 +92,26 @@ public class Frontend {
                     System.out.println("Please enter an integer.");
                     continue;
                 }
-                if (value < 0 || value > 4) {
-                    System.out.println("Please enter a value from 0 to 4.");
-                    continue;
+                if (value >= 0 && value <= maxDigit) { // valid input
+                    break;
+                } else {
+                    System.out.printf("Please enter a value from 0 to %d.\n", maxDigit);
                 }
-                break;
             }
 
-            // check to see if user wants to continue setting up or solve
-            if (!finishedSetup) {
-                puzzle.setPresetCell(position, value); // this method could return false ... but, already error-checked earlier
+            if (finishedSetup) {
+                break;
+            } else {
+                puzzle.setPresetCell(position, value);
                 System.out.println();
                 System.out.println("Updated Puzzle:");
                 displayPuzzle(puzzle);
                 System.out.println();
                 System.out.println("Key:");
-                displayLocations();
+                displayLocations(puzzle);
                 System.out.println();
-                continue;
             }
-
-            break;
-        }
+        } while (true);
 
         // solve now
         boolean result = puzzle.solve();
@@ -99,60 +120,86 @@ public class Frontend {
             System.out.println("The puzzle has been solved! Here is a solution:");
             displayPuzzle(puzzle);
         } else {
-            System.out.println("This puzzle is unsolvable!");
+            System.out.println("This puzzle is unsolvable.");
         }
         System.out.println();
 
     }
 
     private static void displayPuzzle(Puzzle puzzle) {
-        for (int i=0; i<4; i++) {
-            if (i % 2 == 0) {
-                System.out.println("+-----+-----+");
+        int maxDig = puzzle.getMaxDigit();
+        int sqrt = (int) Math.sqrt(maxDig);
+        for (int i=0; i<maxDig; i++) {
+            if (i % sqrt == 0) {
+                printRowSpacerPuzzle(sqrt);
             }
-            System.out.print("| ");
-            for (int j=0; j<4; j++) {
-                int pos = 4*i + j;
-
-                if (puzzle.getCellValue(pos) == 0) {
-                    System.out.print("-");
+            StringBuilder sb = new StringBuilder("| ");
+            for (int j = 0; j < maxDig; j++) {
+                int pos = maxDig * i + j;
+                int val = puzzle.getCellValue(pos);
+                if (val == 0) {
+                    sb.append("-");
                 } else {
-                    System.out.print(puzzle.getCellValue(pos));
+                    sb.append(val);
                 }
-
-                if (j % 2 == 1) {
-                    System.out.print(" | ");
-                } else {
-                    System.out.print(" ");
+                if (j % sqrt == sqrt-1) { // print out a pipe immediately following new column
+                    sb.append(" |");
                 }
+                sb.append(" ");
             }
-            System.out.println();
+            System.out.println(sb);
         }
-        System.out.println("+-----+-----+");
+        printRowSpacerPuzzle(sqrt);
+
+
     }
 
-    private static void displayLocations() {
-        for (int i=0; i<4; i++) {
-            if (i % 2 == 0) {
-                System.out.println("+-------+-------+");
+    private static void displayLocations(Puzzle puzzle) {
+        int maxDig = puzzle.getMaxDigit();
+        int sqrt = (int) Math.sqrt(maxDig);
+        for (int i = 0; i < maxDig; i++) {
+            if (i % sqrt == 0) {
+                printRowSpacerLocations(sqrt);
             }
-            System.out.print("| ");
-            for (int j=0; j<4; j++) {
-                int pos = 4*i + j;
-                if (pos < 10) {
-                    System.out.print(" " + pos);
-                } else {
-                    System.out.print(pos);
+            StringBuilder sb = new StringBuilder("| ");
+            for (int j = 0; j < maxDig; j++) {
+                int pos = maxDig*i + j;
+                if (pos < 10) { // print out extra space for numbers < 10 (formatting)
+                    sb.append(" ");
                 }
-                if (j % 2 == 1) {
-                    System.out.print(" | ");
-                } else {
-                    System.out.print(" ");
+                sb.append(pos);
+                if (j % sqrt == sqrt-1) { // print out a pipe immediately following new column
+                    sb.append(" |");
                 }
+                sb.append(" ");
             }
-            System.out.println();
+            System.out.println(sb);
         }
-        System.out.println("+-------+-------+");
+        printRowSpacerLocations(sqrt);
     }
+
+    private static void printRowSpacerPuzzle(int columns) {
+        if (columns == 2) System.out.println("+-----+-----+");
+        else if (columns == 3) System.out.println("+-------+-------+-------+");
+    }
+
+    private static void printRowSpacerLocations(int columns) {
+        if (columns == 2) System.out.println("+-------+-------+");
+        else if (columns == 3) System.out.println("+----------+----------+----------+");
+    }
+
+    /* A probably-overkill method for printing row spacers
+    private static void printSpacer(int columns) {
+        StringBuilder sb = new StringBuilder("+");
+        for (int i = 0; i < columns; i++) {
+            int numDashes = 2 * columns + columns + 1;
+            for (int j = 0; j < numDashes; j++) {
+                sb.append("-");
+            }
+            sb.append("+");
+        }
+        System.out.println(sb);
+    }
+    */
 
 }

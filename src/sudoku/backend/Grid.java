@@ -1,32 +1,35 @@
 package sudoku.backend;
 
 /**
- * A representation of a 4x4 Sudoku grid. Provides methods for setting up the puzzle and solving it (via brute force).
+ * A representation of a Sudoku grid (9x9 or 4x4). Provides methods for setting up the puzzle and solving it (via brute force).
  * This is a package-private class. Input is assumed to be correct -- error-checking is not provided.
  */
 class Grid {
 
-    final int PUZZLE_SIZE = 16;
-    final int MAX_DIGIT = 4;
+    /**
+     * Size of the puzzle grid. Will be either 16 (4x4) or 81 (9x9).
+     */
+    private int PUZZLE_SIZE;
+    /**
+     * The largest digit the puzzle allows. Will be 4 or 9.
+     */
+    private int MAX_DIGIT;
 
     private Cell[] grid;
 
-    Grid() {
+    /**
+     * Create a new Sudoku grid.
+     * @param size Selects the size of the grid. Values of 4 and 9 accepted. Anything else will default to 9.
+     */
+    Grid(int size) {
+
+        MAX_DIGIT = (size == 4 ? 4 : 9);
+        PUZZLE_SIZE = MAX_DIGIT*MAX_DIGIT;
+
         grid = new Cell[PUZZLE_SIZE];
         for (int i=0; i<PUZZLE_SIZE; i++) {
             grid[i] = new Cell();
         }
-    }
-
-    /**
-     * DEPRECATED
-     * Used for setting up the grid before solving. A preset cell must be locked, or it will be changed during the solving phase.
-     * @param position
-     * @param value
-     */
-    void setAndLockCell(int position, int value) {
-        grid[position].setValue(value);
-        grid[position].lock();
     }
 
     /**
@@ -47,6 +50,14 @@ class Grid {
         return grid[position].getValue();
     }
 
+    int getPuzzleSize() {
+        return PUZZLE_SIZE;
+    }
+
+    int getMaxDigit() {
+        return MAX_DIGIT;
+    }
+
     /**
      * Attempt to solve the puzzle.
      * @return true if a solution was found, false if the puzzle is unsolvable
@@ -55,6 +66,11 @@ class Grid {
 
         // lock all user pre-filled cells
         lockPresetCells();
+
+        // run a pre-check. if puzzle is invalid, quit immediately -- no sense attempting to solve
+        if (!preCheck()) {
+            return false;
+        }
 
         int pos = 0;
         boolean backtracking = false; // need to keep track of direction, so the solver knows which direction to move upon reaching a locked cell
@@ -202,8 +218,70 @@ class Grid {
         }
     }
 
+    /**
+     * Runs a check before solving to check if the puzzle is actually valid
+     * @return
+     */
+    private boolean preCheck() {
+
+        for (int pos = 0; pos < PUZZLE_SIZE; pos++) {
+
+            int curVal = grid[pos].getValue();
+
+            // skip zeroes
+            if (curVal == 0) continue;
+
+            ////// Check row for clash
+            // find the row
+            int row = pos / MAX_DIGIT;
+            // iterate through row
+            for (int j = 0; j < MAX_DIGIT; j++) {
+                int r = row * MAX_DIGIT + j;
+                if (r == pos) { // don't compare the current cell to itself
+                    continue;
+                }
+                if (curVal == grid[r].getValue()) { // clash found, quit
+                    return false;
+                }
+            }
+
+            ////// Check column for clash
+            // find the column
+            int col = pos % MAX_DIGIT;
+            // iterate through column
+            for (int j = 0; j < MAX_DIGIT; j++) {
+                int c = col + MAX_DIGIT * j;
+                if (c == pos) { // don't compare current cell to itself
+                    continue;
+                }
+                if (curVal == grid[c].getValue()) { // clash found, quit
+                    return false;
+                }
+            }
+
+            ////// Check box for clash
+            // find the box
+            int sqrt = (int) Math.sqrt(MAX_DIGIT);
+            int box = sqrt * (pos / (MAX_DIGIT*sqrt)) + (pos % MAX_DIGIT) / sqrt;
+            // iterate through box
+            for (int j = 0; j < MAX_DIGIT; j++) {
+                int b = (box / sqrt) * (MAX_DIGIT * sqrt) + (box % sqrt) * sqrt + (j / sqrt) * MAX_DIGIT + j % sqrt;
+                if (b == pos) { // don't compare current cell to itself
+                    continue;
+                }
+                if (curVal == grid[b].getValue()) { // clash found, quit
+                    return false;
+                }
+            }
+        }
+
+        // if we got here, puzzle is valid
+        return true;
+    }
+
 /*
 some math (for 4x4):
+9x9 math is similar, just use 9's and 3's instead of 4's and 2's (base and sqrt(base))
 
 row:
 row base = position / 4

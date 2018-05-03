@@ -1,32 +1,32 @@
 package sudoku.backend;
 
 /**
- * Provides a backend interface for creating and solving a 4x4 Sudoku puzzle.
+ * Provides a backend interface for creating and solving a 4x4 or 9x9 Sudoku puzzle.
  */
 public class Puzzle {
 
     private Grid grid;
 
     /**
-     * Creates an empty 4x4 Sudoku game board
+     * Creates an empty Sudoku puzzle.
+     * @param size Size of board. Values of 4 or 9 accepted. Other values default to 9.
      */
-    public Puzzle() {
-        grid = new Grid();
+    public Puzzle(int size) {
+        grid = new Grid(size);
     }
 
     /**
      * Allows the frontend to set user-filled preset cells, before solving the puzzle.
-     * @param position cell's position on the board, from 0 to 15
-     * @param value cell's value, from 0 to 4
-     * @return false if position or value are invalid, true otherwise
+     * Invalid input (see parameters) will be IGNORED!
+     * @param position cell's position on the board, ranging from 0 to (size of puzzle)-1. (15 for 4x4, 80 for 9x9)
+     * @param value cell's value, ranging from 0 to max digit (4 or 9). A '0' value will reset a previously-filled cell.
      */
-    public boolean setPresetCell(int position, int value) {
-        if (position < 0 || position > grid.PUZZLE_SIZE-1
-                || value < 0 || value > grid.MAX_DIGIT) {
-            return false;
+    public void setPresetCell(int position, int value) {
+        if (position < 0 || position > grid.getPuzzleSize()-1
+                || value < 0 || value > grid.getMaxDigit()) {
+            return;
         }
         grid.setCell(position, value);
-        return true;
     }
 
     /**
@@ -44,6 +44,14 @@ public class Puzzle {
      */
     public int getCellValue(int position) {
         return grid.getCellValue(position);
+    }
+
+    public int getMaxDigit() {
+        return grid.getMaxDigit();
+    }
+
+    public int getPuzzleSize() {
+        return grid.getPuzzleSize();
     }
 
 }
