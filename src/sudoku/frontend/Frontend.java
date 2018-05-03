@@ -11,23 +11,29 @@ public class Frontend {
 
     public static void main(String[] args) {
 
+        System.out.println("===========================================");
+        System.out.println("Welcome to Sudoku Solver.");
+        System.out.println("Using brute force to solve a Sudoku puzzle.");
+        System.out.println("===========================================");
+        System.out.println();
+
         Scanner sc = new Scanner(System.in);
 
         // get puzzle size
         int maxDigit = 0;
         do {
-            System.out.print("Select puzzle size (enter '4' for 4x4, '9' for 9x9): ");
+            System.out.print("Select a puzzle size (options: 4, 9): ");
             String input = sc.nextLine();
             try {
                 maxDigit = Integer.parseInt(input);
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Enter a 4 or a 9.");
+                System.out.println("Please enter a 4 or a 9.");
                 continue;
             }
-            if (maxDigit == 4 || maxDigit == 9) {
-                break; // valid input
+            if (maxDigit == 4 || maxDigit == 9) { // valid input
+                break;
             } else {
-                System.out.println("Invalid input. Enter a 4 or a 9.");
+                System.out.println("Please enter a 4 or a 9.");
             }
         } while (true);
 
@@ -35,6 +41,8 @@ public class Frontend {
         int maxPosition = maxDigit*maxDigit - 1;;
 
         System.out.printf("Solving for a %dx%d puzzle.\n", maxDigit, maxDigit);
+        System.out.println();
+
         System.out.println("To set up the puzzle:");
         System.out.printf("* Choose a cell to modify. Locations range from 0-%d, according to the following key:\n", maxPosition);
         displayLocations(puzzle);
@@ -63,8 +71,8 @@ public class Frontend {
                     System.out.println("Please enter an integer.");
                     continue;
                 }
-                if (position >= 0 && position <= maxPosition) {
-                    break; // valid input
+                if (position >= 0 && position <= maxPosition) { // valid input
+                    break;
                 } else {
                     System.out.printf("Please enter a location from 0 to %d.\n", maxPosition);
                 }
@@ -84,8 +92,8 @@ public class Frontend {
                     System.out.println("Please enter an integer.");
                     continue;
                 }
-                if (value >= 0 && value <= maxDigit) {
-                    break; // valid input
+                if (value >= 0 && value <= maxDigit) { // valid input
+                    break;
                 } else {
                     System.out.printf("Please enter a value from 0 to %d.\n", maxDigit);
                     continue;
