@@ -1,7 +1,7 @@
 # sudoku-solver
 A console-based java program to solve 9x9 and 4x4 Sudoku puzzles. Solutions are found using a brute force algorithm.
 
-Download the latest jar file [here](...).
+Download the latest jar file [here](https://github.com/dtr335/sudoku-solver/raw/master/jar/solver.jar).
 
 Example run:
 
