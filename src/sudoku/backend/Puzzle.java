@@ -20,7 +20,6 @@ public class Puzzle {
      * Invalid input (see parameters) will be IGNORED!
      * @param position cell's position on the board, ranging from 0 to (size of puzzle)-1. (15 for 4x4, 80 for 9x9)
      * @param value cell's value, ranging from 0 to max digit (4 or 9). A '0' value will reset a previously-filled cell.
-     * @return true when cell successfully set, false when position or value out of range
      */
     public void setPresetCell(int position, int value) {
         if (position < 0 || position > grid.getPuzzleSize()-1
