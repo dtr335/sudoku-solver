@@ -40,6 +40,7 @@ public class Frontend {
         Puzzle puzzle = new Puzzle(maxDigit);
         int maxPosition = maxDigit*maxDigit - 1;
 
+        System.out.println();
         System.out.printf("Solving for a %dx%d puzzle.\n", maxDigit, maxDigit);
         System.out.println();
 
