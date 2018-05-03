@@ -20,7 +20,7 @@ public class Frontend {
         Scanner sc = new Scanner(System.in);
 
         // get puzzle size
-        int maxDigit = 0;
+        int maxDigit;
         do {
             System.out.print("Select a puzzle size (options: 4, 9): ");
             String input = sc.nextLine();
@@ -38,7 +38,7 @@ public class Frontend {
         } while (true);
 
         Puzzle puzzle = new Puzzle(maxDigit);
-        int maxPosition = maxDigit*maxDigit - 1;;
+        int maxPosition = maxDigit*maxDigit - 1;
 
         System.out.printf("Solving for a %dx%d puzzle.\n", maxDigit, maxDigit);
         System.out.println();
@@ -96,7 +96,6 @@ public class Frontend {
                     break;
                 } else {
                     System.out.printf("Please enter a value from 0 to %d.\n", maxDigit);
-                    continue;
                 }
             }
 
